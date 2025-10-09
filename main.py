@@ -18,22 +18,24 @@ def main():
 
     for i in range(3):
         print(f'\n=== Iteration {i+1} ===')
-        score, output = evaluate_pipeline(code)
+        score, output, error = evaluate_pipeline(code)
         print('Output:', output)
+        print('Error:', error)
         print('Score:', score)
 
         with open(f'logs/generated_code_iter{i}.py', 'w') as f:
             f.write(code)
 
         with open('logs/results.jsonl', 'a') as log:
-            json.dump({'iteration': i+1, 'score': score, 'output': output}, log)
+            json.dump({'iteration': i+1, 'score': score, 'output': output, 'error': error}, log)
             log.write('\n')
 
         if score >= 0.8:
             print('Acceptable performance reached.')
             break
         else:
-            code = refine_pipeline(code, f'Score {score}, answer not correct enough.')
+            feedback = error or f'Score {score}, answer not correct enough.'
+            code = refine_pipeline(code, feedback)
             print('Refining pipeline...')
 
 if __name__ == '__main__':

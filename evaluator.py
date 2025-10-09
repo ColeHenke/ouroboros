@@ -1,4 +1,3 @@
-# evaluator.py
 import subprocess
 from openai import OpenAI
 
@@ -10,20 +9,31 @@ def sanitize_code(code: str) -> str:
     return code.replace('```python', '').replace('```', '').strip()
 
 
-def run_pipeline(code: str) -> str:
-    """Run generated code safely in a subprocess and capture stdout."""
-    sanitized_code = sanitize_code(code)
-
+def run_pipeline(code: str) -> tuple[str, str]:
+    """Run generated code safely in a subprocess and capture stdout and/or stderr."""
     result = subprocess.run(
-        ['python3', '-c', sanitized_code],
+        ['python3', '-c', code],
         capture_output=True, text=True, timeout=20
     )
-    return result.stdout.strip() or result.stderr.strip()
+
+    return result.stdout.strip(), result.stderr.strip()
 
 
-def evaluate_pipeline(code: str, question='Who created Python?') -> tuple[float, str]:
+def validate_imports(code: str):
+    required_modules = ['langchain', 'langchain_openai', 'langchain_community']
+    for mod in required_modules:
+        try:
+            __import__(mod)
+        except ImportError as e:
+            print(f'Missing or invalid import: {mod}', e)
+
+
+def evaluate_pipeline(code: str, question='Who created Python?') -> tuple[float, str, str]:
     """Execute pipeline and grade factual correctness."""
-    output = run_pipeline(code)
+    output, error = run_pipeline(code)
+
+    if error:
+        return 0.0, output, error
 
     judge_prompt = f'''
     Question: {question}
@@ -33,11 +43,11 @@ def evaluate_pipeline(code: str, question='Who created Python?') -> tuple[float,
     '''
     response = client.chat.completions.create(
         model='gpt-4o-mini',
-        messages=[{"role": "user", "content": judge_prompt}]
+        messages=[{'role': 'user', 'content': judge_prompt}]
     )
     score_text = response.choices[0].message.content.strip()
     try:
         score = float(score_text.split()[0])
     except ValueError:
         score = 0.0
-    return score, output
+    return score, output, error
