@@ -9,7 +9,10 @@ def refine_pipeline(old_code: str, feedback: str) -> str:
     Feedback: {feedback}
 
     Please improve it while keeping the same purpose and structure.
-    Return only valid, complete Python code.
+    Return only executable Python code.
+    Do NOT include markdown fences (no ``` or ```python).
+    Do NOT include explanations or comments before or after the code.
+    
     CODE:
     {old_code}
     '''

@@ -6,7 +6,7 @@ def generate_pipeline_code(task_description: str) -> str:
     """Ask the LLM to write LangChain code for the given task."""
     prompt = f'''
     You are an expert ML engineer. 
-    Write Python code using LangChain that performs this task:
+    Write *pure* Python code using LangChain that performs this task:
 
     {task_description}
 
@@ -15,7 +15,10 @@ def generate_pipeline_code(task_description: str) -> str:
     - Use FAISS and OpenAIEmbeddings for retrieval.
     - Use ChatOpenAI for the LLM.
     - Answer a user question and print only the final answer.
-    Return only valid Python code, nothing else. Not even markdown with the Python.
+
+    Return only executable Python code.
+    Do NOT include markdown fences (no ``` or ```python).
+    Do NOT include explanations or comments before or after the code.
     '''
     response = client.chat.completions.create(
         model='gpt-4o-mini',

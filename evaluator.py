@@ -4,13 +4,22 @@ from openai import OpenAI
 
 client = OpenAI()
 
+
+def sanitize_code(code: str) -> str:
+    """Sanitize code by removing Python markdown fences incase prompt directives are not followed."""
+    return code.replace('```python', '').replace('```', '').strip()
+
+
 def run_pipeline(code: str) -> str:
     """Run generated code safely in a subprocess and capture stdout."""
+    sanitized_code = sanitize_code(code)
+
     result = subprocess.run(
-        ['python3', '-c', code],
+        ['python3', '-c', sanitized_code],
         capture_output=True, text=True, timeout=20
     )
     return result.stdout.strip() or result.stderr.strip()
+
 
 def evaluate_pipeline(code: str, question='Who created Python?') -> tuple[float, str]:
     """Execute pipeline and grade factual correctness."""
