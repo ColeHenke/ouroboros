@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 import os, json
 from builder import generate_pipeline_code
 from evaluator import evaluate_pipeline
@@ -19,6 +22,9 @@ def main():
         print('Output:', output)
         print('Score:', score)
 
+        with open(f'logs/generated_code_iter{i}.py', 'w') as f:
+            f.write(code)
+
         with open('logs/results.jsonl', 'a') as log:
             json.dump({'iteration': i+1, 'score': score, 'output': output}, log)
             log.write('\n')
@@ -28,7 +34,7 @@ def main():
             break
         else:
             code = refine_pipeline(code, f'Score {score}, answer not correct enough.')
-            print('🔧 Refining pipeline...')
+            print('Refining pipeline...')
 
 if __name__ == '__main__':
     main()
