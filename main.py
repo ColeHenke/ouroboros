@@ -16,7 +16,7 @@ def main():
     task = 'Build a LangChain pipeline that answers factual questions about the text file.'
     code = generate_pipeline_code(task)
 
-    for i in range(3):
+    for i in range(7):
         print(f'\n=== Iteration {i+1} ===')
         score, output, error = evaluate_pipeline(code)
         print('Output:', output)

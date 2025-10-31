@@ -27,7 +27,7 @@ def generate_pipeline_code(task_description: str) -> str:
     Do NOT include explanations or comments before or after the code.
     '''
     response = client.chat.completions.create(
-        model='gpt-4o-mini',
+        model='gpt-4o',
         messages=[{'role': 'user', 'content': prompt}]
     )
     code = response.choices[0].message.content.strip()

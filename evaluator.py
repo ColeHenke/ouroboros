@@ -1,5 +1,6 @@
 import subprocess
 from openai import OpenAI
+import json
 
 client = OpenAI()
 
@@ -19,7 +20,7 @@ def run_pipeline(code: str) -> tuple[str, str]:
     return result.stdout.strip(), result.stderr.strip()
 
 
-def validate_imports(code: str):
+def validate_imports():
     required_modules = ['langchain', 'langchain_openai', 'langchain_community']
     for mod in required_modules:
         try:
@@ -28,7 +29,7 @@ def validate_imports(code: str):
             print(f'Missing or invalid import: {mod}', e)
 
 
-def evaluate_pipeline(code: str, question='Who created Python?') -> tuple[float, str, str]:
+def evaluate_pipeline(code: str, question='Evaluate how true these statements are') -> tuple[float, str, str]:
     """Execute pipeline and grade factual correctness."""
     output, error = run_pipeline(code)
 
